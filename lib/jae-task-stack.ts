@@ -5,28 +5,27 @@ import * as lambda from 'aws-cdk-lib/aws-lambda';
 
 export class JaeTaskStack extends cdk.Stack {
   private fetchFeatureCollection: NodejsFunction;
-  private fetchFeatureCollectionUrl: lambda.FunctionUrl;
 
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    this.createLambda();
-    this.createLambdaUrl();
+    this.createLambdaFunction();
+    this.addLambdaUrl();
   }
 
-  private createLambda() {
+  private createLambdaFunction() {
     this.fetchFeatureCollection = new NodejsFunction(this, 'FetchFeatureCollectionLambda', {
-      runtime: lambda.Runtime.NODEJS_16_X,
+      runtime: lambda.Runtime.NODEJS_18_X,
       entry: './lib/lambda/index.js',
       handler: 'handler'
     });
   }
 
-  private createLambdaUrl() {
-    this.fetchFeatureCollectionUrl = this.fetchFeatureCollection.addFunctionUrl({
+  private addLambdaUrl() {
+    const fetchFeatureCollectionUrl = this.fetchFeatureCollection.addFunctionUrl({
       authType: lambda.FunctionUrlAuthType.NONE
     });
 
-    new cdk.CfnOutput(this, 'FunctionUrl ', { value: this.fetchFeatureCollectionUrl.url });
+    new cdk.CfnOutput(this, 'FunctionUrl', { value: fetchFeatureCollectionUrl.url });
   }
 }
